@@ -9,9 +9,7 @@
 namespace
 {
 
-
     const int BUFFER_SIZE = 30720;
-
 
     void log(const std::string &message)
     {
@@ -24,7 +22,6 @@ namespace
         log("ERROR: " + error_message);
         exit(1);
     }
-
 
 }; //namecpace
 
@@ -93,7 +90,7 @@ namespace http
 
         while (true)
         {
-            log("====== Waiting for a new connection ======\n\n\n");
+            log("~~~Waiting for a new connection\n\n");
             acceptConnection(server_new_socket);
 
             char buffer[BUFFER_SIZE] = {0};
@@ -104,7 +101,7 @@ namespace http
             }
 
             std::ostringstream ss;
-            ss << "------ Received Request from client ------\n\n";
+            ss << "~~~Received Request from client\n";
             log(ss.str());
 
             sendResponse();
@@ -126,9 +123,44 @@ namespace http
 
     std::string TcpServer::buildResponse()
     {
-        std::string htmlFile = "<!DOCTYPE html><html lang=\"en\"><body><h1> HOME </h1><p> Hello from your Server :) </p></body></html>";
+        std::string htmlFile = R"(
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Welcome to Our Server</title>
+                <style>
+                    body {
+                        background-color: #1f1f1f; /* Цвет фона */
+                        color: #ffffff; /* Цвет текста */
+                        font-family: Arial, sans-serif; /* Шрифт текста */
+                        text-align: center; /* Выравнивание текста по центру */
+                        margin: 0;
+                        padding: 0;
+                        height: 100vh;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                    }
+                    h1 {
+                        color: #00ff00; /* Зеленый цвет заголовка */
+                    }
+                    p {
+                        font-size: 18px; /* Размер текста */
+                        margin-top: 20px; /* Отступ сверху */
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>Welcome to Our Server</h1>
+                <p>Hello from your Server :)</p>
+            </body>
+            </html>
+            )";
+
         std::ostringstream ss;
-        ss << "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: " << htmlFile.size() << "\n\n"
+        ss << "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: " << htmlFile.size() << "\n"
            << htmlFile;
 
         return ss.str();
@@ -142,11 +174,11 @@ namespace http
 
         if (bytesSent == server_message.size())
         {
-            log("------ Server Response sent to client ------\n\n");
+            log("~~~Server Response sent to client\n");
         }
         else
         {
-            log("Error sending response to client");
+            log("~~~Error sending response to client");
         }
     }
     
