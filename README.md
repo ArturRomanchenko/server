@@ -18,7 +18,7 @@ Install docker on the machine and configure it.
 1. Clone repo to machine
 
 ```
-git clone https://github.com/PsychoKidX/server.git
+git clone https://github.com/ArturRomanchenko/server.git
 ```
 
 2. Go to the repository folder ```cd server/```
