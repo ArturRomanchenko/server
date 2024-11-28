@@ -9,7 +9,7 @@
 #include <string>
 
 
-namespace http
+namespace network::http
 {
 
     class TcpServer

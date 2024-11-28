@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <unistd.h>
+#include <fstream>
 
 
 namespace
@@ -26,7 +27,7 @@ namespace
 }; //namecpace
 
 
-namespace http
+namespace network::http
 {
 
     TcpServer::TcpServer(const std::string ip_address, int port): server_ip_address(ip_address), server_port(port), server_socket(),
@@ -123,45 +124,22 @@ namespace http
 
     std::string TcpServer::buildResponse()
     {
-        std::string htmlFile = R"(
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Welcome to Our Server</title>
-                <style>
-                    body {
-                        background-color: #1f1f1f; /* Цвет фона */
-                        color: #ffffff; /* Цвет текста */
-                        font-family: Arial, sans-serif; /* Шрифт текста */
-                        text-align: center; /* Выравнивание текста по центру */
-                        margin: 0;
-                        padding: 0;
-                        height: 100vh;
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                    }
-                    h1 {
-                        color: #00ff00; /* Зеленый цвет заголовка */
-                    }
-                    p {
-                        font-size: 18px; /* Размер текста */
-                        margin-top: 20px; /* Отступ сверху */
-                    }
-                </style>
-            </head>
-            <body>
-                <h1>Welcome to Our Server</h1>
-                <p>Hello from your Server :)</p>
-            </body>
-            </html>
-            )";
+        // Открываем файл
+        std::ifstream htmlFile("index.html");
+        if (!htmlFile.is_open()) {
+            // Возвращаем ошибку, если файл не найден
+            return "HTTP/1.1 500 Internal Server Error\nContent-Type: text/plain\n\nFailed to load HTML file.";
+        }
 
+        // Читаем содержимое файла в строку
+        std::ostringstream buffer;
+        buffer << htmlFile.rdbuf();
+        std::string htmlContent = buffer.str();
+
+        // Формируем HTTP-ответ
         std::ostringstream ss;
-        ss << "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: " << htmlFile.size() << "\n"
-           << htmlFile;
+        ss << "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: " << htmlContent.size() << "\n\n"
+        << htmlContent;
 
         return ss.str();
     }
