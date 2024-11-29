@@ -1,5 +1,8 @@
 # VS Code configuration files
-.vscode
+.vscode/
 
 # CMake build files
 build/
+
+# Logs
+logs/

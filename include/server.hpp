@@ -1,23 +1,21 @@
 #ifndef TCPSERVER
 #define TCPSERVER
 
-
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 
-
 namespace network::http
 {
-
+    
     class TcpServer
     {
     public:
         TcpServer(std::string server_ip_address, int port);
         ~TcpServer();
-        void startListen();
+        void start();
 
     private:
         std::string server_ip_address;
