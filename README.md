@@ -10,7 +10,13 @@ Implementation of an [http](https://en.wikipedia.org/wiki/HTTP) server in C++, a
 + [C++](https://cbrnsolafact.com/)
 + [CMake](https://cmake.org/) 
 
-```http://localhost:8080/```
+```Bash
+
+./run.sh
+
+http://localhost:8080/
+
+```
 
 ### Contact
 

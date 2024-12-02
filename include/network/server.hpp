@@ -1,11 +1,14 @@
-#ifndef TCPSERVER
-#define TCPSERVER
+#ifndef TCPSERVER_HPP
+#define TCPSERVER_HPP
 
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+#include <iostream>
+#include <sstream>
+#include <unistd.h>
 
 namespace network::http
 {
@@ -34,7 +37,7 @@ namespace network::http
         void sendResponse();
     };
 
-}; // namespace http
+}; // namespace network::http
 
 
-#endif //TCPSERVER
+#endif //TCPSERVER_HPP

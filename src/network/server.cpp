@@ -1,50 +1,7 @@
-#include "server.hpp"
-
-#include <iostream>
-#include <sstream>
-#include <unistd.h>
-#include <fstream>
-#include <iomanip>
-#include <chrono>
+#include "network/server.hpp"
+#include "utils/logs.hpp"
 
 #define BUFFER_SIZE 30720
-
-namespace
-{
-
-    void log(const std::string &message)
-    {
-        auto now = std::chrono::system_clock::now();
-        auto time = std::chrono::system_clock::to_time_t(now);
-        std::tm* tm = std::localtime(&time);
-
-        std::ostringstream timeStream;
-        timeStream << std::put_time(tm, "%Y-%m-%d %H:%M:%S");
-
-        std::string timestamp = timeStream.str();
-        std::string logMessage = "[" + timestamp + "] " + message;
-
-        std::ofstream out("../logs/server.log", std::ios::app);
-        if (out.is_open())
-        {
-            out << logMessage << '\n';
-        }
-        else
-        {
-            std::cerr << "Error opening '.log' file for writing!" << std::endl;
-        }
-        out.close();
-    }
-
-
-    void exitWithError(const std::string &error_message)
-    {
-        log(error_message);
-        exit(1);
-    }
-
-}; //namecpace
-
 
 namespace network::http
 {
@@ -60,8 +17,8 @@ namespace network::http
         if (start_server() != 0)
         {
             std::ostringstream ss;
-            ss << "[ERORR] [Server] Failed to start server with PORT: " << ntohs(socket_address.sin_port);
-            log(ss.str());
+            ss << "Failed to start server with PORT: " << ntohs(socket_address.sin_port);
+            utils::logs::log(utils::logs::level::ERROR, ss.str());
         }
     }
 
@@ -75,13 +32,13 @@ namespace network::http
         server_socket = socket(AF_INET, SOCK_STREAM, 0);
         if (server_socket < 0)
         {
-            exitWithError("[ERORR] [Server] Cannot create socket");
+            utils::logs::log(utils::logs::level::ERROR, "Cannot create socket");
             return 1;
         }
 
         if (bind(server_socket, (sockaddr *)&socket_address, socket_address_length) < 0)
         {
-            exitWithError("[ERORR] [Server] Cannot connect socket to address");
+            utils::logs::log(utils::logs::level::ERROR, "Cannot connect socket to address");
             return 1;
         }
 
@@ -99,12 +56,12 @@ namespace network::http
     {
         if (listen(server_socket, 20) < 0)
         {
-            exitWithError("[ERORR] [Server] Socket listen failed");
+            utils::logs::log(utils::logs::level::ERROR, "Socket listen failed");
         }
 
         std::ostringstream ss;
-        ss << "[INFO] [Server] Listening on ADDRESS: " << inet_ntoa(socket_address.sin_addr) << " PORT: " << ntohs(socket_address.sin_port) << "\n";
-        log(ss.str());
+        ss << "Listening on ADDRESS: " << inet_ntoa(socket_address.sin_addr) << " PORT: " << ntohs(socket_address.sin_port) << "\n";
+        utils::logs::log(utils::logs::level::INFO, ss.str());
 
         int bytesReceived;
 
@@ -116,12 +73,12 @@ namespace network::http
 
             if (bytesReceived < 0)
             {
-                exitWithError("[ERORR] [Server] Failed to read bytes from client socket connection");
+                utils::logs::log(utils::logs::level::ERROR, "Failed to read bytes from client socket connection");
             }
 
             std::ostringstream ss;
-            ss << "[INFO] [Server] Received Request from client\n";
-            log(ss.str());
+            ss << "Received Request from client\n";
+            utils::logs::log(utils::logs::level::INFO, ss.str());
 
             sendResponse();
 
@@ -135,17 +92,17 @@ namespace network::http
         if (server_new_socket < 0)
         {
             std::ostringstream ss;
-            ss << "[ERORR] [Server] Server failed to accept incoming connection from ADDRESS: " << inet_ntoa(socket_address.sin_addr) << "; PORT: " << ntohs(socket_address.sin_port);
-            exitWithError(ss.str());
+            ss << "Server failed to accept incoming connection from ADDRESS: " << inet_ntoa(socket_address.sin_addr) << "; PORT: " << ntohs(socket_address.sin_port);
+            utils::logs::log(utils::logs::level::ERROR, ss.str());
         }
     }
 
     std::string TcpServer::buildResponse()
     {
-        std::ifstream htmlFile("../src/index.html");
+        std::ifstream htmlFile("../src/web/index.html");
         if (!htmlFile.is_open())
         {
-            log("[ERORR] [Server] File ./src/index.html is not opened");
+            utils::logs::log(utils::logs::level::ERROR, "File ./src/index.html is not opened");
             return "HTTP/1.1 500 Internal Server Error\r\n"
                 "Content-Type: text/plain\r\n\r\n"
                 "Failed to load HTML file.";
@@ -173,11 +130,11 @@ namespace network::http
 
         if (bytesSent == server_message.size())
         {
-            log("[INFO] [Server] Server Response sent to client\n");
+            utils::logs::log(utils::logs::level::INFO, "Server Response sent to client\n");
         }
         else
         {
-            log("[ERORR] [Server] Error sending response to client");
+            utils::logs::log(utils::logs::level::ERROR, "Error sending response to client");
         }
     }
     
